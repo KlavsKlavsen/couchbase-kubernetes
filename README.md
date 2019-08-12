@@ -21,90 +21,25 @@ $ cd couchbase-kubernetes
 
 ## Start etcd
 
-Although Kubernetes runs its own etcd, this is not accessible to applications running within Kubernetes.  The Couchbase sidekick containers require etcd to discover Couchbase Server Nodes and bootstrap the cluster.
+Install the etcd-operator and setup a cluster using that. https://github.com/coreos/etcd-operator/
 
-The current recommended approach is to either:
+name of etcd cluster service MUST be same as the podname you give to bin/deploy.sh ($2).
 
-1. Run your own etcd cluster *outside* the Kubernetes cluster, and setup secure networking between the two (you don't want to expose your etcd cluster publicly)
-1. Start up a single node etcd within the Kubernetes cluster.
-
-Running your own separate etcd cluster is outside the scope of this document, so we'll ignore that option for now and focus on the other option.
-
-The downside with running a single etcd node within Kubernetes has the major disadvantage of being a single point of failure, nor will it handle pod restarts of the etcd pod -- if that pod is restarted and gets a new ip address, then future couchbase nodes that are started won't be able to find etcd and auto-join the cluster.
-
-Here's how to start the app-etcd service and pod:
-
+Then insert config for your couchbase cluster
 ```
-$ kubectl create -f services/app-etcd.yaml
-$ kubectl create -f pods/app-etcd.yaml
-```
-
-Get the pod ip:
-
-```
-$ kubectl describe pod app-etcd
-```
-
-you should see:
-
-```
-Name:				app-etcd
-Namespace:			default
-Image(s):			tleyden5iwx/etcd-discovery
-Node:				gke-couchbase-server-648006db-node-qgu2/10.240.158.17
-Labels:				name=app-etcd
-Status:				Running
-Reason:
-Message:
-IP:				10.248.1.5
-```
-
-Make a note of the Node it's running on (eg, gke-couchbase-server-648006db-node-qgu2) as well as the Pod IP (10.248.1.5)
-
-## Add Couchbase Server Admin credentials in etcd
-
-
-First, you will need to ssh into the host node where the app-etcd pod is running (or any other node in the cluster):
-
-
-( Alternatively on linux and mac you can use this one liner )
-
-```
-kubectl describe pod app-etcd | grep Node | awk '{print $2}'| sed 's/\/.*//'
-```
-
-```
-$ gcloud compute ssh gke-couchbase-server-648006db-node-qgu2
-```
-
-Replace `gcloud compute ssh gke-couchbase-server-648006db-node-qgu2` with the host found in the previous step.
-
-Next, use curl to add a value for the `/couchbase.com/userpass` key in etcd.  Use the Pod IP found above.
-
-( Alternatively on linux and mac you can use this one liner to get the IP )
-
-```
-kubectl describe pod app-etcd | grep IP: | awk '{print $2}'
-```
-
-```
-root@k8s~$ curl -L http://10.248.1.5:2379/v2/keys/couchbase.com/userpass -X PUT -d value="user:passw0rd"
+root@k8s~$ curl -L http://$podip:2379/v2/keys/couchbase.com/userpass -X PUT -d value="user:passw0rd"
 ```
 
 Replace `user:passw0rd` with the actual values you want to use.
 
 After you run the command, exit the SSH session to get back to your workstation.
 
-```
-$ exit
-```
-
 ## Kick off Service and Replication Controller for couchbase-server
 
 First the replication controllers:
+
 ```
-$ kubectl create -f replication-controllers/couchbase-admin-server.yaml
-$ kubectl create -f replication-controllers/couchbase-server.yaml
+./bin/deploy.sh default mylocalcouchbase
 ```
 
 Then the services:
@@ -196,7 +131,6 @@ Sync Gateway is a server-side component for Couchbase Mobile which provides a RE
 It provides a good example of setting up an application tier on top of Couchbase Server.  If you were creating a tier of webservers that used a Couchbase SDK to store data in Couchbase Server, your architecture would be very similar to this.
 
 To kick off a Sync Gateway replica set, run:
-
 ```
 $ kubectl create -f replication-controllers/sync-gateway.yaml
 ```

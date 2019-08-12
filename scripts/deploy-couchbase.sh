@@ -18,3 +18,7 @@ do
   kubectl delete -n $1 -f $TMP
   kubectl apply -n $1 -f $TMP
 done
+
+#now add services
+kubectl create -f services/couchbase-service.yaml
+kubectl create -f services/couchbase-admin-service.yaml
