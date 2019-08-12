@@ -20,6 +20,8 @@ spec:
         # The api server enforces this constraint.
         name: couchbase-server
         role: nodes
+      annotations:
+        sidecar.istio.io/inject: "false"
     spec:
       containers:
         - name: couchbase-server
