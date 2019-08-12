@@ -2,9 +2,19 @@ Here are instructions on getting Couchbase Server and Couchbase Sync Gateway run
 
 To get a bird's eye view of what is being created, check the following [Architecture Diagrams](https://github.com/couchbase/kubernetes/wiki/Architecture-Diagrams)
 
+# License
+
+These scripts are forked from https://github.com/couchbase/kubernetes - which has NO license (ie. you have NO RIGHT TO USE IT)
+The source used enterprise editions of docker images - which means you don't have any right to use that either.
+
+This has been modified to use community editions - and the author of the image used to initiate couchbase ( https://github.com/tleyden/couchbase-cluster-go ) has been contacted - and he was glad to add a license - so that is freely useable (Apache 2.0 license).
+
+To make this fully Open Source (not FOSS) - a reimplementation of the few yaml files and text that is from the original - must be written. Its not a big task though.
+
 # Kubernetes cluster setup
 
 First you need to setup Kubernetes itself before running Couchbase on it.  These instructions are specific to your particular setup (bare metal or Cloud Provider).
+
 
 # Couchbase Server
 
