@@ -49,15 +49,7 @@ After you run the command, exit the SSH session to get back to your workstation.
 First the replication controllers:
 
 ```
-./bin/deploy.sh default mylocalcouchbase
-```
-
-Then the services:
-
-```
-$ kubectl create -f services/couchbase-service.yaml
-$ kubectl create -f services/couchbase-admin-service.yaml
-```
+./scripts/deploy-couchbase.sh default mylocalcouchbase
 
 The `couchbase-admin` pod and service creates a couchbase server with an externally accessible admin ui. The admin replication controller (named `couchbase-admin-controller`) should never be scaled passed 1. Instead the `couchbase-controller` can be scaled to any desired number of replicas. The `couchbase-service` is configured to route traffic to both the `couchbase-admin-server` pod and the `couchbase-server` pods.
 

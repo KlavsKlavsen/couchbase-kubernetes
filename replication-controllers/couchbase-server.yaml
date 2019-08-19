@@ -36,5 +36,5 @@ spec:
           command:
             - /bin/sh
             - -c
-            - update-wrapper --skip-etcd-check couchbase-cluster start-couchbase-sidekick --discover-local-ip --etcd-servers http://PODNAME-etcd-client:2379
+            - update-wrapper --skip-etcd-check couchbase-cluster start-couchbase-sidekick --discover-local-ip --etcd-servers http://PODNAME-etcd-cluster-client:2379
             # Can also use http://app-etcd-service.kubernetes.local
